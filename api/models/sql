@@ -1,0 +1,92 @@
+CREATE DATABASE salesdb
+CREATE TABLE role
+(
+    roleid int PRIMARY KEY,
+    rolename varchar(50)
+);
+CREATE TABLE account
+(
+    accountid int PRIMARY KEY,
+    username varchar(30),
+    `password` varchar(30),
+    name varchar(40),
+    email varchar(40),
+    phone varchar(12),
+    roleid int,
+    status tinyint,
+    FOREIGN key (roleid) REFERENCES role(roleid)
+);
+CREATE TABLE category
+(
+    categoryid int PRIMARY KEY,
+    categoryname varchar(50),
+    description varchar(200)
+);
+CREATE TABLE unit
+(
+    unitid int PRIMARY KEY,
+    unitname varchar(20),
+    description varchar(200)
+);
+CREATE TABLE itemstatus
+(
+    statusid int PRIMARY KEY,
+  	statusname varchar(30)
+);
+CREATE TABLE item
+(
+    itemid int PRIMARY KEY,
+  	itemname varchar(100),
+    description varchar(500),
+    price int,
+    categoryid int,
+    unitid int,    
+    statusid int,
+image varchar(50),
+images varchar(500),
+    FOREIGN key (categoryid) REFERENCES category(categoryid),
+    FOREIGN key (unitid) REFERENCES unit(unitid),
+    FOREIGN key (statusid) REFERENCES itemstatus(statusid)
+);
+CREATE TABLE orderstatus
+(
+    statusid int PRIMARY KEY,
+  	statusname varchar(30)
+);
+CREATE table customer
+(
+    customerid int PRIMARY KEY,
+    phone varchar(12) ,
+    `password` varchar(30),
+    name varchar(30),
+    address varchar(100),
+    email varchar(50),
+    avatar varchar(50)
+);
+CREATE TABLE `order`
+(
+    orderid varchar(12) PRIMARY KEY,/*YYYYMMDD-STT*/
+    orderdate datetime,
+    estimateddelivery datetime,
+    delivery datetime,
+    total int,
+    customerid int,
+    address varchar(100),
+    note varchar(50),
+    statusid int,
+accountid int,
+    FOREIGN key (customerid) REFERENCES customer(customerid),
+    FOREIGN key (statusid) REFERENCES orderstatus(statusid),
+    FOREIGN key (accountid) REFERENCES account(accountid)
+
+);
+CREATE TABLE orderdetail
+(
+    id int PRIMARY KEY,
+    orderid varchar(12),
+    itemid int,
+    quatity int,
+    price int,
+    FOREIGN key (orderid) REFERENCES `order`(orderid),
+    FOREIGN key (itemid) REFERENCES item(itemid)
+);

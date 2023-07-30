@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+     <!-- Required meta tags -->
+     <meta charset="utf-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+     <!-- Bootstrap CSS -->
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+     <link href="https://cdn.datatables.net/1.12.0/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+
+     <script src="https://code.jquery.com/jquery-3.6.0.js"
+          integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+          crossorigin="anonymous"></script>
+
+     <script src="https://cdn.datatables.net/1.12.0/js/jquery.dataTables.min.js"></script>
+
+     <script src="https://cdn.datatables.net/1.12.0/js/dataTables.bootstrap5.min.js"></script>
+
+     <title></title>
+</head>
+
+<body>
+
+     <div class="container">
+          <h1 class="mt-4 mb-4 text-center text-primary"><b>Edit Item Name</b></h1>
+          <div class="card-body" id="app">
+
+          </div>
+     </div>
+
+     <!-- JavaScript để lấy giá trị của route parameter "id" từ URL -->
+     <script>
+          // Lấy toàn bộ URL hiện tại
+          const currentURL = window.location.href;
+
+          // Tách URL thành các thành phần (protocol, host, path, query)
+          const urlParts = new URL(currentURL);
+
+          // Lấy giá trị của route parameter "id" từ URL
+          const id = urlParts.pathname.split('/').pop();
+
+          console.log('ID cần chỉnh sửa:', id);
+
+
+          //get data theo id
+
+          function getdataid() {
+               const url = "http://localhost:3000/api/v1/items/" + id;
+               fetch(url)
+                    .then(response => {
+                         if (!response.ok) {
+                              throw Error("Error ");
+                         }
+                         return response.json();
+                    })
+                    .then(data => {
+
+                         const html = data.map(user => {
+
+                              return `
+               
+<div class="mb-3">
+     <label for="exampleInputEmail1" class="form-label">Item Name</label>
+     <input type="text" class="form-control" id="itemname" aria-describedby="emailHelp" value = "${user.itemname}">
+
+</div>
+
+<div class="mb-3">
+     <label for="exampleInputPassword1" class="form-label">Description</label>
+     <input type="text" class="form-control" id="description" value = "${user.description}">
+</div>
+
+
+<div class="mb-3">
+     <label for="exampleInputPassword1" class="form-label">Price</label>
+     <input type="number" class="form-control" id="price" value = "${user.price}">
+</div>
+
+
+<div class="mb-3 form-check">
+     <input type="checkbox" class="form-check-input" id="exampleCheck1">
+     <label class="form-check-label" for="exampleCheck1">Checked</label>
+</div>
+
+<button type="button" class="btn btn-primary" onclick='UpdateData()'>Save Changes</button>
+               
+               `;
+                         })
+                              .join("");
+                         document.querySelector("#app").insertAdjacentHTML("afterbegin", html);
+                    })
+                    .catch(error => {
+                         console.log(error);
+                    });
+          }
+
+          getdataid();
+
+
+
+          // update data theo id 
+
+          function UpdateData() {
+
+               var itemname = document.getElementById("itemname").value;
+               var description = document.getElementById("description").value;
+               var price = document.getElementById("price").value;
+
+               if (itemname && description && price) {
+
+                    // Dữ liệu cần update
+                    const newData = {
+                         itemid: id,
+                         itemname: itemname,
+                         description: description,
+                         price: price,
+                         // Thêm các trường dữ liệu cần update
+                    };
+
+                    // URL của API hoặc endpoint để thực hiện yêu cầu UPDATE
+                    const url = 'http://localhost:3000/api/v1/items/' + id; // Thay đổi URL này thành endpoint thích hợp của bạn
+
+                    fetch(url, {
+                         method: 'PUT', // Hoặc 'PATCH' nếu server hỗ trợ
+                         headers: {
+                              'Content-Type': 'application/json'
+                         },
+                         body: JSON.stringify(newData)
+                    })
+                         .then(response => {
+                              if (!response.ok) {
+                                   throw new Error('Request failed.');
+                              }
+                              return response.json();
+                         })
+                         .then(data => {
+                              console.log('Data updated:', data);
+                         })
+                         .catch(error => {
+                              console.error('Error updating data:', error);
+                         });
+
+                    window.location.href = '/home';
+
+               } else {
+                    alert("Vui lòng điền đầy đủ thông tin trước khi cập nhập");
+               }
+               console.log("itemname=" + itemname);
+          }
+     </script>
+
+</body>
+
+</html>
